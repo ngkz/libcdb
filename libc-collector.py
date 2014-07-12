@@ -51,7 +51,7 @@ def decompress_xz(dest, xzpath):
 
 def is_libc(path):
     status = subprocess.call(
-            "readelf -s {} | grep __libc_start_main > /dev/null 2>&1".format(shlex.quote(path)),
+            "nm -D {} | grep __libc_start_main > /dev/null 2>&1".format(shlex.quote(path)),
             shell = True)
     return status == 0
 
