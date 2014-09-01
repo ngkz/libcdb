@@ -23,8 +23,9 @@ class LibCDB:
         c = self.conn.cursor()
         try:
             c.execute("""create table libraries(
-                package text unique not null,
-                path text unique not null
+                package text not null,
+                path text not null,
+                unique(package, path)
             )""")
             c.execute("""create table symbols(
                 library_id integer not null,
@@ -32,6 +33,7 @@ class LibCDB:
                 offset integer not null,
                 unique(library_id, name)
             )""")
+            c.execute("create index symbols_name on symbols(name);")
             self.conn.commit()
         except sqlite3.OperationalError:
             pass
