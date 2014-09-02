@@ -8,7 +8,7 @@ def get_exports(path):
         output = subprocess.check_output(["nm", "-D", path], stderr = null)
 
     exports = {}
-    for match in re.findall(r"^([0-9a-f]+) *. *(\S*)$", output,
+    for match in re.findall(r"^([0-9a-f]+) *. *(\S*)$", output.decode(),
                             re.MULTILINE | re.IGNORECASE):
         offset, name = match
         exports[name] = int(offset, 16)
