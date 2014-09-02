@@ -2,6 +2,7 @@
 
 import unittest
 import libcdb
+import os
 
 class LibcDBTest(unittest.TestCase):
     def setUp(self):
@@ -19,21 +20,37 @@ class LibcDBTest(unittest.TestCase):
     def test_search(self):
         self.assertEquals(self.libcdb.search({
             "__libc_start_main": 0x55555320
-        }), ["testlibs/testlib1.so", "testlibs/testlib2.so"])
+        }), [
+            os.path.abspath("testlibs/testlib1.so"),
+            os.path.abspath("testlibs/testlib2.so")
+        ])
         self.assertEquals(self.libcdb.search({
             "a": 0x55555320
         }), [])
         self.assertEquals(self.libcdb.search({
             "__libc_start_main": 0x55555273
-        }), ["testlibs/testlib3.so"])
+        }), [os.path.abspath("testlibs/testlib3.so")])
         self.assertEquals(self.libcdb.search({
             "__libc_start_main": 0x55555320,
             "write": 0x55555321
-        }), ["testlibs/testlib1.so"])
+        }), [os.path.abspath("testlibs/testlib1.so")])
         self.assertEquals(self.libcdb.search({
             "__libc_start_main": 0x55555320,
             "write": 0x55555322
-        }), ["testlibs/testlib2.so"])
+        }), [os.path.abspath("testlibs/testlib2.so")])
+
+class LibcDBPathTest(unittest.TestCase):
+    def test_path(self):
+        db = libcdb.LibCDB(":memory:")
+        os.chdir("testlibs")
+        try:
+            db.add_library("libc-test1", "testlib1.so")
+        finally:
+            os.chdir("..")
+
+        self.assertEquals(db.search({
+            "__libc_start_main": 0x55555320
+        }), [os.path.abspath("testlibs/testlib1.so")])
 
 if __name__ == '__main__':
     unittest.main()

@@ -20,6 +20,7 @@ class LibCDB:
         if path is None:
             path = os.path.join(os.path.dirname(__file__), "libc.db")
         self.conn = sqlite3.connect(path)
+        self.dbdir = os.path.abspath(os.path.dirname(path))
         c = self.conn.cursor()
         try:
             c.execute("""create table libraries(
@@ -47,8 +48,9 @@ class LibCDB:
         return f
 
     def add_library(self, package, path):
+        path_dbrel = os.path.relpath(path, self.dbdir)
         c = self.conn.cursor()
-        c.execute("insert into libraries (package, path) values (?, ?)", (package, path))
+        c.execute("insert into libraries (package, path) values (?, ?)", (package, path_dbrel))
         library_id = c.lastrowid
 
         exports = get_exports(path)
@@ -71,7 +73,7 @@ class LibCDB:
 
         query = "select libraries.path from libraries, symbols where libraries.rowid = symbols.library_id and (" + " or ".join(conditions) + ") group by symbols.library_id having count(symbols.library_id) = ?"
         c.execute(query, _vars)
-        result = [row[0] for row in c.fetchall()]
+        result = [os.path.join(self.dbdir, row[0]) for row in c.fetchall()]
         c.close()
         return result
 
