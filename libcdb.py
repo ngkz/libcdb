@@ -23,10 +23,13 @@ class LibCDB:
         self.dbdir = os.path.abspath(os.path.dirname(path))
         c = self.conn.cursor()
         try:
+            c.execute("""create table packages(
+                name text unique not null
+            )""")
             c.execute("""create table libraries(
-                package text not null,
+                package_id integer not null,
                 path text not null,
-                unique(package, path)
+                unique(package_id, path)
             )""")
             c.execute("""create table symbols(
                 library_id integer not null,
@@ -42,20 +45,24 @@ class LibCDB:
 
     def has_package(self, package):
         c = self.conn.cursor()
-        c.execute("select exists(select package from libraries where package = ?)", (package,))
+        c.execute("select exists(select name from packages where name = ?)", (package,))
         f = c.fetchone()[0] == 1
         c.close()
         return f
 
-    def add_library(self, package, path):
-        path_dbrel = os.path.relpath(path, self.dbdir)
+    def add_package(self, package, libs):
         c = self.conn.cursor()
-        c.execute("insert into libraries (package, path) values (?, ?)", (package, path_dbrel))
-        library_id = c.lastrowid
+        c.execute("insert into packages values (?)", (package,))
+        package_id = c.lastrowid
 
-        exports = get_exports(path)
-        for name, offset in exports.items():
-            c.execute("insert into symbols values(?, ?, ?)", (library_id, name, offset))
+        for path in libs:
+            path_dbrel = os.path.relpath(path, self.dbdir)
+            c.execute("insert into libraries values (?, ?)", (package_id, path_dbrel))
+            library_id = c.lastrowid
+
+            exports = get_exports(path)
+            for name, offset in exports.items():
+                c.execute("insert into symbols values(?, ?, ?)", (library_id, name, offset))
 
         self.conn.commit()
         c.close()
