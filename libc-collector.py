@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# depends on rpm2cpio and dpkg
+# depends on rpm2cpio
 
 import ftplib
 import tempfile
@@ -11,8 +11,10 @@ import fnmatch
 import re
 import tarfile
 import shlex
+import libcdb
+import shutil
 
-LIBS_DIR = os.path.join(os.path.dirname(__file__), "libs")
+db = libcdb.LibCDB()
 
 magic_check = re.compile('[*?[]')
 def has_magic(s):
@@ -51,38 +53,49 @@ def decompress_xz(dest, xzpath):
 
 def is_libc(path):
     status = subprocess.call(
-            "nm -D {} | grep __libc_start_main >/dev/null 2>&1".format(shlex.quote(path)),
+            "(nm -D {} | grep __libc_start_main) >/dev/null 2>&1".format(shlex.quote(path)),
             shell = True)
     return status == 0
 
-def extract_libc(_dir):
-    for root, dirs, files in os.walk(_dir):
+def extract_libc(dest, src):
+    libs = []
+    for root, dirs, files in os.walk(src):
         for name in files:
             path = os.path.join(root, name)
-            if not (name.endswith(".so") and (not os.path.islink(path)) and is_libc(path)):
-                #not libc
-                os.unlink(path)
+            if name.endswith(".so") and (not os.path.islink(path)) and is_libc(path):
+                path_pkgrel = os.path.relpath(path, src)
+                lib_dest = os.path.join(dest, path_pkgrel)
+                os.makedirs(os.path.dirname(lib_dest))
+                shutil.copy2(path, lib_dest)
+                libs.append(lib_dest)
+
+    return libs
 
 def get_package(ftp, url, file_handler):
-    print("GET: " + url)
     pkgname = url.split("/")[-1]
-    dest = os.path.join(LIBS_DIR, pkgname)
-    if os.path.exists(dest):
-        print("skip")
+    dest = os.path.join(os.path.join(db.dbdir, "libs"), pkgname)
+
+    if db.has_package(pkgname):
+        print("skip:", url)
         return
 
     pkgfile = tempfile.NamedTemporaryFile(suffix='.deb')
+    tmpdir = tempfile.mkdtemp()
+    os.mkdir(dest)
     try:
+        print("get:", url)
         ftp.retrbinary("RETR " + url, pkgfile.write)
         pkgfile.flush()
 
-        os.mkdir(dest)
-        file_handler(dest, pkgfile.name)
-        extract_libc(dest)
+        file_handler(tmpdir, pkgfile.name)
+        libs = extract_libc(dest, tmpdir)
+        db.add_package(pkgname, libs)
     except:
-        pkgfile.close()
-        os.rmdir(dest)
+        shutil.rmtree(dest)
         raise
+    finally:
+        pkgfile.close()
+        shutil.rmtree(tmpdir)
 
 def ftp_glob_get3(ftp, url, name, patterns, file_handler):
     if len(patterns) == 0:
