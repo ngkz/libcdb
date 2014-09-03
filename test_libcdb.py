@@ -40,6 +40,11 @@ class LibcDBTest(unittest.TestCase):
             "write": 0x55555322
         }), [os.path.abspath("testlibs/testlib2.so")])
 
+    def test_has_symbol(self):
+        self.assertTrue(self.libcdb.has_symbol("this_is_testlib1"))
+        self.assertTrue(self.libcdb.has_symbol("this_is_testlib2"))
+        self.assertFalse(self.libcdb.has_symbol("AAAAAAAAAAAAAAAAAAA"))
+
 class LibcDBPathTest(unittest.TestCase):
     def test_path(self):
         db = libcdb.LibCDB(":memory:")

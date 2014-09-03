@@ -50,6 +50,13 @@ class LibCDB:
         c.close()
         return f
 
+    def has_symbol(self, symbol):
+        c = self.conn.cursor()
+        c.execute("select exists(select name from symbols where name = ?)", (symbol,))
+        f = c.fetchone()[0] == 1
+        c.close()
+        return f
+
     def add_package(self, package, libs):
         c = self.conn.cursor()
         c.execute("insert into packages values (?)", (package,))
