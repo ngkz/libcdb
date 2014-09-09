@@ -76,7 +76,7 @@ def get_package(ftp, url, file_handler):
     dest = os.path.join(os.path.join(db.dbdir, "libs"), pkgname)
 
     if db.has_package(pkgname):
-        print("skip:", url)
+        #print("skip:", url)
         return
 
     pkgfile = tempfile.NamedTemporaryFile(suffix='.deb')
@@ -107,7 +107,7 @@ def ftp_glob_get3(ftp, url, name, patterns, file_handler):
 
 def ftp_glob_get2(ftp, url, patterns, file_handler):
     pattern = patterns.pop(0)
-    print("SEARCH: " + url + "/" + pattern)
+    #print("SEARCH: " + url + "/" + pattern)
 
     if not has_magic(pattern):
         ftp_glob_get3(ftp, url, pattern, patterns, file_handler)
