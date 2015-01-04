@@ -131,8 +131,8 @@ def ftp_glob_get(server, pattern, file_handler):
 print("debian")
 ftp_glob_get('ftp.jp.debian.org', '/debian/pool/main/e/eglibc/libc6*.deb', decompress_deb)
 ftp_glob_get('ftp.jp.debian.org', '/debian/pool/main/g/glibc/libc6*.deb', decompress_deb)
-ftp_glob_get('ftp.debian-ports.org', '/debian/pool*/main/e/eglibc/libc6_*.deb', decompress_deb)
-ftp_glob_get('ftp.debian-ports.org', '/debian/pool*/main/g/glibc/libc6_*.deb', decompress_deb)
+ftp_glob_get('ftp.debian-ports.org', '/debian/pool*/main/e/eglibc/libc6*.deb', decompress_deb)
+ftp_glob_get('ftp.debian-ports.org', '/debian/pool*/main/g/glibc/libc6*.deb', decompress_deb)
 
 #ubuntu
 print("ubuntu")
@@ -140,8 +140,8 @@ ftp_glob_get('ja.archive.ubuntu.com', '/ubuntu/pool/main/e/eglibc/libc6*.deb', d
 ftp_glob_get('ja.archive.ubuntu.com', '/ubuntu/pool/main/g/glibc/libc6*.deb', decompress_deb)
 ftp_glob_get('ja.archive.ubuntu.com', '/ubuntu/pool/universe/*/*cross*/libc6*.deb', decompress_deb)
 ftp_glob_get('ja.archive.ubuntu.com', '/ubuntu/pool/universe/g/glibc/libc6*.deb', decompress_deb)
-ftp_glob_get('ports.ubuntu.com', '/ubuntu-ports/pool/main/e/eglibc/libc6_*.deb', decompress_deb)
-ftp_glob_get('ports.ubuntu.com', '/ubuntu-ports/pool/main/g/glibc/libc6_*.deb', decompress_deb)
+ftp_glob_get('ports.ubuntu.com', '/ubuntu-ports/pool/main/e/eglibc/libc6*.deb', decompress_deb)
+ftp_glob_get('ports.ubuntu.com', '/ubuntu-ports/pool/main/g/glibc/libc6*.deb', decompress_deb)
 
 #centos
 ftp_glob_get('ftp.jaist.ac.jp', '/pub/Linux/CentOS/*/*/*/*/glibc-[0123456789]*.rpm', decompress_rpm)
