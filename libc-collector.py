@@ -144,6 +144,7 @@ ftp_glob_get('ports.ubuntu.com', '/ubuntu-ports/pool/main/e/eglibc/libc6*.deb', 
 ftp_glob_get('ports.ubuntu.com', '/ubuntu-ports/pool/main/g/glibc/libc6*.deb', decompress_deb)
 
 #centos
+print("centos")
 ftp_glob_get('ftp.jaist.ac.jp', '/pub/Linux/CentOS/*/*/*/*/glibc-[0123456789]*.rpm', decompress_rpm)
 
 #fedora
