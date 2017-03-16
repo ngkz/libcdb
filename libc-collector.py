@@ -90,7 +90,10 @@ def extract_libc(dest, src):
 
 def get_package(ftp, url, file_handler):
     pkgname = url.split("/")[-1]
-    dest = os.path.join(os.path.join(db.dbdir, "libs"), pkgname)
+    libc_dir = os.path.join(db.dbdir, "libs")
+    if not os.path.exists(libc_dir):
+        os.mkdir(libc_dir)
+    dest = os.path.join(libc_dir, pkgname)
 
     if db.has_package(pkgname):
         #print("skip:", url)
