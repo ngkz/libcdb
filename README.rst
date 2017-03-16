@@ -1,6 +1,6 @@
 libcdb
 ======
-This program allows the user to collect libc from various distributions and search for them that have specified symbols.
+This program allows the user to collect libc from various distributions and search for them with leaked address.
 
 Usage
 -----
