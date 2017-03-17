@@ -1,11 +1,17 @@
 libcdb
 ======
-This program allows the user to collect libc from various distributions and search for them with leaked address.
+This program allows the user to collect libc from various distributions and search for them by known symbol address.
 
 Usage
 -----
+.. code-block:: sh
+
+   # collect libc
+   $ ./libc-collector.py
+
 .. code-block:: python
 
+   # search for libc by known symbol address
    >>> import libcdb
    >>> db = libc.db.LibCDB()
    >>> db.search({"__libc_start_main": 0x7ffff760be50})
